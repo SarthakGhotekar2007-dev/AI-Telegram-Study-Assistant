@@ -1,0 +1,200 @@
+{
+  "name": "AI Telegram Study Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "bb2b44be-871c-4ef6-ba78-bc820fef2df0",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "db75f827-7b14-4b6c-af6b-473d3ffd4d61",
+      "credentials": {
+        "telegramApi": {
+          "id": "5rt4pK4BJAOBOS9F",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a friendly study and coding assistant for a student learning Dart, Flutter, FastAPI, Python, SQL and English speaking. Explain concepts simply with short examples. When asked about coding errors (e.g. FastAPI 422), explain the cause and a fix step by step. If the user asks in Marathi or asks for Marathi, reply in simple Marathi (keep technical terms in English); otherwise reply in English and add a short Marathi summary at the end. Keep answers under 3500 characters and use plain text without Markdown tables. Remind the user to understand any code before using it."
+        }
+      },
+      "id": "5159b5ab-2d62-46c0-abc9-8c1eeb6e11fe",
+      "name": "Study Assistant Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.4-mini",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "7e5bafb0-be39-44f9-b4e6-1b6e5f9de56c",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        336
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "id": "573e9052-78f7-476f-9326-16992a15f6ad",
+      "name": "Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ String($json.output).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "297a4823-7280-4847-ae23-5a7b21908c2b",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        112
+      ],
+      "webhookId": "bb1adf49-55a9-4822-8dda-31e1bc66ecdc",
+      "credentials": {
+        "telegramApi": {
+          "id": "5rt4pK4BJAOBOS9F",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 621998499,
+          "message": {
+            "message_id": 12,
+            "from": {
+              "id": 8463734442,
+              "is_bot": false,
+              "first_name": "Sarthak",
+              "last_name": "Ghotekar",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 8463734442,
+              "first_name": "Sarthak",
+              "last_name": "Ghotekar",
+              "type": "private"
+            },
+            "date": 1792077510,
+            "text": "What is flutter"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Study Assistant Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Study Assistant Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Study Assistant Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Study Assistant Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "691f8d1e-e96a-4773-b76f-7584f5e8acd1",
+  "meta": {
+    "instanceId": "299101be692a6f55780c3a2d6cf41390d344574cce7df2b8756a301fb5d98950"
+  },
+  "nodeGroups": [],
+  "id": "6G8vsCucpWCi3LXf",
+  "tags": []
+}
