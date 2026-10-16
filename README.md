@@ -59,7 +59,7 @@ Telegram Response
 
 ### 4. Telegram Bot Demo: FastAPI 422 Error
 
-![FastAPI 422 Error Explanation](telegram-demo(2).png)
+![FastAPI 422 Error Explanation](<telegram-demo (2).png>)
 
 ##  Try the Bot
 
